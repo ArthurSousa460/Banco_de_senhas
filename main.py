@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
+from random import randint
 
 class aplication(object):
     def __init__(self, tk):
@@ -28,14 +29,15 @@ class aplication(object):
 
         self.data = sqlite3.connect('banco_de_senha.db')
         self.cursor = self.data.cursor()
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Cadastro(Site TEXT NOT NULL, Senha INTEGER NOT NULL) ''')
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS Cadastro(Id INTEGER, Site TEXT NOT NULL, Senha INTEGER NOT NULL) ''')
 
 
     def write(self):
+        Id = randint(0,1000)
         site_text = self.site.get()
         senha_text = self.senha.get()
         if site_text != '':
-            self.cursor.execute('''INSERT into Cadastro(Site, Senha) VALUES(?, ?)''', (site_text, senha_text))
+            self.cursor.execute('''INSERT into Cadastro(Id, Site, Senha) VALUES(?, ?, ?)''', (Id, site_text, senha_text))
             self.data.commit()
             self.data.close()
             self.site.delete(0, END)
@@ -47,9 +49,11 @@ class aplication(object):
         tk.geometry('350x263')
         tk.title('lista de senhas')
         tk.configure(background='#dde')
-        self.table = ttk.Treeview(tk, columns=('Site', 'Senha'), show='headings')
+        self.table = ttk.Treeview(tk, columns=('Id', 'Site', 'Senha'), show='headings')
+        self.table.column('Id', minwidth=0, width=50)
         self.table.column('Site', minwidth=0, width=150)
         self.table.column('Senha', minwidth=0)
+        self.table.heading('Id', text='Id')
         self.table.heading('Site', text='Site')
         self.table.heading('Senha', text='Senha')
         self.table.pack()
@@ -68,14 +72,15 @@ class aplication(object):
 
 
     def delete(self):
-        select_item = self.table.selection()
-        self.data = sqlite3.connect('banco_de_senha.db')
-        self.cursor = self.data.cursor()
+        select_item = self.table.selection()[0]
+        value = self.table.item(select_item, 'values')
+        Id = value[0]
+        data = sqlite3.connect('banco_de_senha.db')
+        cursor = data.cursor()
         self.table.delete(select_item)
-        self.cursor.execute('''DELETE FROM Cadastro WHERE Site=? AND Senha=?''')
-        self.data.commit()
-        self.data.close()
-    
+        cursor.execute('''DELETE FROM Cadastro WHERE Id='''+ Id)
+        data.commit()
+        data.close()
 
 
 tk = Tk()
