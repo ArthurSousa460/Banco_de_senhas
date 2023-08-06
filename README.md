@@ -5,6 +5,6 @@
 <h2>tecnologias usadas</h2>
 <ul>
   <li>Python;</li>
-  <li>SQLlite3</li>
-  <li>PySimpleGui</li>
+  <li>SQLlite3;</li>
+  <li>Tkinter.</li>
 </ul>
